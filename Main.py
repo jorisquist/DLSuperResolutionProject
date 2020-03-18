@@ -11,7 +11,7 @@ from SuperResolutionDataset import SuperResolutionDataset
 from SuperResolutionNet import SuperResolutionNet
 
 
-def psnr(mse):
+def mse_to_psnr(mse):
     return 10 * math.log10(1. / mse)
 
 
@@ -31,7 +31,7 @@ def main():
                                                shuffle=True,
                                                num_workers=0)
 
-    net = SuperResolutionNet(r, activation=nn.Tanh())
+    net = SuperResolutionNet(r, activation=nn.ReLU())
     if use_gpu:
         net = net.cuda()
         print('Running on gpu')
@@ -46,16 +46,13 @@ def main():
 
         net.train()
         for input, target in train_loader:
-            if use_gpu:
-                input = input.cuda()
-                target = target.cuda()
 
             optimizer.zero_grad()
 
             output = net(input)
 
             loss = loss_function(output, target)
-            psnr.append(psnr(loss.item()))
+            psnr.append(mse_to_psnr(loss.item()))
 
             loss.backward()
 
@@ -69,12 +66,13 @@ def main():
         if mean_train_loss < lowest_loss[1]:
             lowest_loss = (epoch, mean_train_loss)
 
-        if epoch > lowest_loss[0] + 50:
+        if epoch > lowest_loss[0] + 100:
             print("No improvement for the last 100 epochs, so stopping training...")
             net.eval()
+            torch.save(net, f'SuperResulutionNet_r-{r}_psnr-{int(round(np.mean(psnr) * 100))}__mse-{int(round(mean_train_loss * 10000))}')
             break
 
-    torch.save(net, 'saved_net')
+
 
 
 if __name__ == '__main__':
