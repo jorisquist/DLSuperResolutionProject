@@ -13,7 +13,7 @@ class SuperResolutionDataset(Dataset):
     def __init__(self, root_dir, upscale_factor, use_gpu=False):
         self.root_dir = root_dir
         self.upscale_factor = upscale_factor
-        self.images = [f for f in listdir(self.root_dir) if f.endswith('.bmp')]
+        self.images = [f for f in listdir(self.root_dir) if f.endswith('.bmp') or f.endswith('.jpg')]
         self.data = list()
         for image_name in self.images:
             self.data.append(self.get_data_from_image(image_name))
