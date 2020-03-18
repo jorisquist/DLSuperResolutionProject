@@ -1,3 +1,4 @@
+import math
 import sys
 from multiprocessing.spawn import freeze_support
 
@@ -10,10 +11,14 @@ from SuperResolutionDataset import SuperResolutionDataset
 from SuperResolutionNet import SuperResolutionNet
 
 
+def psnr(mse):
+    return 10 * math.log10(1. / mse)
+
+
 def main():
     use_gpu = torch.cuda.is_available()
     bs = 1
-    r = 4
+    r = 3
 
     # Getting image data
     transform = transforms.Compose(
@@ -26,7 +31,7 @@ def main():
                                                shuffle=True,
                                                num_workers=0)
 
-    net = SuperResolutionNet(4, activation=nn.Tanh())
+    net = SuperResolutionNet(r, activation=nn.Tanh())
     if use_gpu:
         net = net.cuda()
         print('Running on gpu')
@@ -37,6 +42,7 @@ def main():
     lowest_loss = (0, float('inf'))
     for epoch in range(1000):
         train_loss = []
+        psnr = []
 
         net.train()
         for input, target in train_loader:
@@ -49,6 +55,7 @@ def main():
             output = net(input)
 
             loss = loss_function(output, target)
+            psnr.append(psnr(loss.item()))
 
             loss.backward()
 
@@ -57,17 +64,18 @@ def main():
             train_loss.append(loss.item())
 
         mean_train_loss = np.mean(train_loss)
-        print("Epoch:", epoch, "Training Loss: ", mean_train_loss)
+        print(f"Epoch: {epoch: >3} Training Loss: {mean_train_loss:.6f} Mean PSNR: {np.mean(psnr):.3f}")
 
         if mean_train_loss < lowest_loss[1]:
             lowest_loss = (epoch, mean_train_loss)
 
-        if epoch > lowest_loss[0] + 10:
+        if epoch > lowest_loss[0] + 50:
             print("No improvement for the last 100 epochs, so stopping training...")
             net.eval()
             break
 
     torch.save(net, 'saved_net')
+
 
 if __name__ == '__main__':
     freeze_support()
