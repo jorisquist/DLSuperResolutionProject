@@ -18,7 +18,7 @@ def imshow(img):
     plt.show()
 
 
-net = torch.load('saved_net')
+net = torch.load("saved_net")
 r = net.r
 print(f"r: {r}")
 
@@ -30,10 +30,9 @@ for path in test_set_paths:
     psnr = []
     test_set = SuperResolutionDataset(path, r, use_gpu=use_gpu)
 
-    train_loader = torch.utils.data.DataLoader(test_set,
-                                               batch_size=1,
-                                               shuffle=True,
-                                               num_workers=0)
+    train_loader = torch.utils.data.DataLoader(
+        test_set, batch_size=1, shuffle=True, num_workers=0
+    )
 
     for input, target in iter(train_loader):
         if use_gpu:
@@ -45,29 +44,33 @@ for path in test_set_paths:
 
         output = net(input)
 
-
         if use_gpu:
             input = input.cpu()
             output = output.cpu()
             target = target.cpu()
 
-
-        bicubic = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize([int(r * input.size()[2]),
-                               int(r * input.size()[3])],
-                              PIL.Image.BICUBIC),
-            transforms.ToTensor()
-        ])
+        bicubic = transforms.Compose(
+            [
+                transforms.ToPILImage(),
+                transforms.Resize(
+                    [int(r * input.size()[2]), int(r * input.size()[3])],
+                    PIL.Image.BICUBIC,
+                ),
+                transforms.ToTensor(),
+            ]
+        )
         bicubic_upscaled = bicubic(input[0])
 
-        nearest_neighbour = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.Resize([int(r * input.size()[2]),
-                               int(r * input.size()[3])],
-                              PIL.Image.NEAREST),
-            transforms.ToTensor()
-        ])
+        nearest_neighbour = transforms.Compose(
+            [
+                transforms.ToPILImage(),
+                transforms.Resize(
+                    [int(r * input.size()[2]), int(r * input.size()[3])],
+                    PIL.Image.NEAREST,
+                ),
+                transforms.ToTensor(),
+            ]
+        )
 
         input = nearest_neighbour(input[0])
         output = torch.clamp(output.detach(), 0, 1)
@@ -76,7 +79,7 @@ for path in test_set_paths:
             target = target.repeat(1, 3, 1, 1)
 
         mse_loss = nn.MSELoss()
-        psnr.append(10 * math.log10(1. / mse_loss(output, target).item()))
+        psnr.append(10 * math.log10(1.0 / mse_loss(output, target).item()))
 
         # images = [input, target[0], output.detach()[0], bicubic_upscaled]
 

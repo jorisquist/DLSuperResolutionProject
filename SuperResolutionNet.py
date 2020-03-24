@@ -24,7 +24,9 @@ class SuperResolutionNet(nn.Module):
         for i in range(self.l):
             x = self.activation(self.params[i](x))
 
-        x = self.params[self.l](x)  # Don't use the activation on the last convolutional layer
+        x = self.params[self.l](
+            x
+        )  # Don't use the activation on the last convolutional layer
         x = self.deconvolution(x)
 
         return x
