@@ -43,17 +43,18 @@ def main():
     optimizer = optim.AdamW(net.parameters())
     # scheduler = MultiStepLR(optimizer, milestones=[30, 80], gamma=0.1)
 
+    computer_name = os.environ['COMPUTERNAME']
+
     lowest_loss = (0, float('inf'))
     highest_psnr = - float('inf')
     max_epochs_without_improvement = 1000
     begin_time = time.time()
     for epoch in range(10000):
         train_loss = []
-        psnr = []
+        # psnr = []
 
         net.train()
         for input, target in train_loader:
-
 
             optimizer.zero_grad()
 
@@ -66,18 +67,19 @@ def main():
             optimizer.step()
             # scheduler.step(epoch)
 
-            psnr.append(mse_to_psnr(loss.item()))
+            # psnr.append(mse_to_psnr(loss.item()))
             train_loss.append(loss.item())
 
         mean_train_loss = np.mean(train_loss)
+        mean_psnr = mse_to_psnr(mean_train_loss)
 
 
         if mean_train_loss < lowest_loss[1]:
-            print(f"Epoch: {epoch: >3} Training Loss: {mean_train_loss:.6f} Mean PSNR: {np.mean(psnr):.3f} in {time.time() - begin_time:.2f}s #")
+            print(f"Epoch: {epoch: >3} Training Loss: {mean_train_loss:.6f} Mean PSNR: {mean_psnr:.6f} in {time.time() - begin_time:.2f}s #")
             lowest_loss = (epoch, mean_train_loss)
-            highest_psnr = np.mean(psnr)
+            highest_psnr = mean_psnr
             if (highest_psnr > 25):
-                computer_name = os.environ['COMPUTERNAME']
+
                 torch.save(net, f'SuperResulutionNet_best_of_run-{computer_name}')
         elif epoch % 100 == 0:
             print(
@@ -88,8 +90,7 @@ def main():
             net.eval()
             break
 
-    computer_name = os.environ['COMPUTERNAME']
-    old_file = os.path.join(".", "SuperResulutionNet_best_of_run")
+    old_file = os.path.join(".", f'SuperResulutionNet_best_of_run-{computer_name}')
     new_file = os.path.join(".",
                             f'SuperResulutionNet_r-{r}_psnr-{int(round(highest_psnr * 100))}__mse-{int(round(lowest_loss[1] * 10000))}-{computer_name}')
     print(
