@@ -18,7 +18,7 @@ def imshow(img):
     plt.show()
 
 
-net = torch.load('SuperResulutionNet_best_of_run')
+net = torch.load('SuperResulutionNet_best_of_run-JORIS-DESKTOP')
 r = net.r
 print(f"r: {r}")
 

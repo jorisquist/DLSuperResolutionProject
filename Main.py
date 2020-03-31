@@ -20,14 +20,11 @@ def mse_to_psnr(mse):
 
 def main():
     use_gpu = torch.cuda.is_available()
-    bs = 64
+    bs = 32
     r = 3
 
-    # Getting image data
-    transform = transforms.Compose(
-        [transforms.ToTensor()])  # ,
-
-    training_set = SuperResolutionDataset('train_data/Set91', r, use_gpu=use_gpu)
+    # training_set = SuperResolutionDataset('train_data/Set91', r, use_gpu=use_gpu)
+    training_set = SuperResolutionDataset('test_data/BSD500', r, use_gpu=use_gpu)
 
     train_loader = torch.utils.data.DataLoader(training_set,
                                                batch_size=bs,
@@ -41,7 +38,6 @@ def main():
 
     loss_function = nn.MSELoss()
     optimizer = optim.AdamW(net.parameters())
-    # scheduler = MultiStepLR(optimizer, milestones=[30, 80], gamma=0.1)
 
     computer_name = os.environ['COMPUTERNAME']
 
@@ -49,9 +45,8 @@ def main():
     highest_psnr = - float('inf')
     max_epochs_without_improvement = 1000
     begin_time = time.time()
-    for epoch in range(10000):
+    for epoch in range(100000):
         train_loss = []
-        # psnr = []
 
         net.train()
         for input, target in train_loader:
@@ -65,22 +60,20 @@ def main():
             loss.backward()
 
             optimizer.step()
-            # scheduler.step(epoch)
 
-            # psnr.append(mse_to_psnr(loss.item()))
             train_loss.append(loss.item())
 
         mean_train_loss = np.mean(train_loss)
         mean_psnr = mse_to_psnr(mean_train_loss)
 
-
         if mean_train_loss < lowest_loss[1]:
-            print(f"Epoch: {epoch: >3} Training Loss: {mean_train_loss:.6f} Mean PSNR: {mean_psnr:.6f} in {time.time() - begin_time:.2f}s #")
+            print(f"Epoch: {epoch: >3} Training Loss: {mean_train_loss:.6f} Mean PSNR: {mean_psnr:.2f} in {time.time() - begin_time:.2f}s #")
             lowest_loss = (epoch, mean_train_loss)
             highest_psnr = mean_psnr
-            if (highest_psnr > 25):
 
+            if highest_psnr > 25:
                 torch.save(net, f'SuperResulutionNet_best_of_run-{computer_name}')
+
         elif epoch % 100 == 0:
             print(
                 f"Epoch: {epoch: >3} in {time.time() - begin_time:.2f}s")
@@ -90,14 +83,12 @@ def main():
             net.eval()
             break
 
+    network_name = f'SuperResulutionNet_r-{r}_psnr-{int(round(highest_psnr * 100))}__mse-{int(round(lowest_loss[1] * 10000))}-{computer_name}'
     old_file = os.path.join(".", f'SuperResulutionNet_best_of_run-{computer_name}')
-    new_file = os.path.join(".",
-                            f'SuperResulutionNet_r-{r}_psnr-{int(round(highest_psnr * 100))}__mse-{int(round(lowest_loss[1] * 10000))}-{computer_name}')
-    print(
-        f'Saving best epoch ({lowest_loss[0]}) with loss: {lowest_loss[1]} and psnr: {highest_psnr} as:\nSuperResulutionNet_r-{r}_psnr-{int(round(highest_psnr * 100))}__mse-{int(round(lowest_loss[1] * 10000))}')
+    new_file = os.path.join(".", network_name)
+    print(f'Saving best epoch ({lowest_loss[0]}) with loss: {lowest_loss[1]} and psnr: {highest_psnr} as:')
+    print(network_name)
     os.rename(old_file, new_file)
-
-
 
 if __name__ == '__main__':
     freeze_support()
