@@ -31,9 +31,11 @@ class SuperResolutionDataset(Dataset):
     def get_data_from_image(self, image_name):
         image = io.imread(self.root_dir + '/' + image_name)
 
-        h, w = len(image), len(image[0])
+        # h, w = len(image), len(image[0])
+        h, w = 256, 256
         cropped_h = h - (h % self.upscale_factor)
         cropped_w = w - (w % self.upscale_factor)
+
 
         target_transform = transforms.Compose([
             transforms.ToPILImage(),

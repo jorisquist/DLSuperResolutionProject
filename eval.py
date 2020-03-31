@@ -18,7 +18,7 @@ def imshow(img):
     plt.show()
 
 
-net = torch.load('saved_net')
+net = torch.load('SuperResulutionNet_best_of_run')
 r = net.r
 print(f"r: {r}")
 
@@ -30,12 +30,12 @@ for path in test_set_paths:
     psnr = []
     test_set = SuperResolutionDataset(path, r, use_gpu=use_gpu)
 
-    train_loader = torch.utils.data.DataLoader(test_set,
-                                               batch_size=1,
-                                               shuffle=True,
-                                               num_workers=0)
+    test_loader = torch.utils.data.DataLoader(test_set,
+                                              batch_size=1,
+                                              shuffle=True,
+                                              num_workers=0)
 
-    for input, target in iter(train_loader):
+    for input, target in iter(test_loader):
         if use_gpu:
             input = input.cuda()
             target = target.cuda()
