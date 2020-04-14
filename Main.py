@@ -3,28 +3,46 @@ import sys
 from multiprocessing.spawn import freeze_support
 
 import torch
-from torch import optim, nn
+from ax import optimize
+from torch import nn
 from torch.optim.lr_scheduler import MultiStepLR
 from torchvision import transforms
 import numpy as np
 import time
 import os
 
+import Trainer
 from SuperResolutionDataset import SuperResolutionDataset
 from SuperResolutionNet import SuperResolutionNet
 
 
-def mse_to_psnr(mse):
-    return 10 * math.log10(1. / mse)
+import signal
+
+
+from eval import evaluate
 
 
 def main():
+
+    best_parameters, best_values, experiment, model = optimize(
+        parameters=[
+            {"name": "lr", "type": "range", "bounds": [1e-6, 0.4], "log_scale": True},
+        ],
+        # Booth function
+        evaluation_function=train_evaluate,
+        minimize=True,
+    )
+
+    print(best_parameters, best_values, experiment, model)
+
+
+def train_evaluate(parameters):
     use_gpu = torch.cuda.is_available()
     bs = 32
     r = 3
 
-    # training_set = SuperResolutionDataset('train_data/Set91', r, use_gpu=use_gpu)
-    training_set = SuperResolutionDataset('test_data/BSD500', r, use_gpu=use_gpu)
+    training_set = SuperResolutionDataset('train_data/Set91', r, use_gpu=use_gpu)
+    # training_set = SuperResolutionDataset('test_data/BSD500', r, use_gpu=use_gpu)
 
     train_loader = torch.utils.data.DataLoader(training_set,
                                                batch_size=bs,
@@ -32,63 +50,8 @@ def main():
                                                num_workers=0)
 
     net = SuperResolutionNet(r, activation=nn.ReLU())
-    if use_gpu:
-        net = net.cuda()
-        print('Running on gpu')
+    return Trainer.train(net, use_gpu, train_loader, r, max_epochs=1000, max_epochs_without_improvement=100, learning_rate=parameters['lr'])
 
-    loss_function = nn.MSELoss()
-    optimizer = optim.AdamW(net.parameters())
-
-    computer_name = os.environ['COMPUTERNAME']
-
-    lowest_loss = (0, float('inf'))
-    highest_psnr = - float('inf')
-    max_epochs_without_improvement = 1000
-    begin_time = time.time()
-    for epoch in range(100000):
-        train_loss = []
-
-        net.train()
-        for input, target in train_loader:
-
-            optimizer.zero_grad()
-
-            output = net(input)
-
-            loss = loss_function(output, target)
-
-            loss.backward()
-
-            optimizer.step()
-
-            train_loss.append(loss.item())
-
-        mean_train_loss = np.mean(train_loss)
-        mean_psnr = mse_to_psnr(mean_train_loss)
-
-        if mean_train_loss < lowest_loss[1]:
-            print(f"Epoch: {epoch: >3} Training Loss: {mean_train_loss:.6f} Mean PSNR: {mean_psnr:.2f} in {time.time() - begin_time:.2f}s #")
-            lowest_loss = (epoch, mean_train_loss)
-            highest_psnr = mean_psnr
-
-            if highest_psnr > 25:
-                torch.save(net, f'SuperResulutionNet_best_of_run-{computer_name}')
-
-        elif epoch % 100 == 0:
-            print(
-                f"Epoch: {epoch: >3} in {time.time() - begin_time:.2f}s")
-
-        if epoch > lowest_loss[0] + max_epochs_without_improvement:
-            print(f"No improvement for the last {max_epochs_without_improvement} epochs, so stopping training...")
-            net.eval()
-            break
-
-    network_name = f'SuperResulutionNet_r-{r}_psnr-{int(round(highest_psnr * 100))}__mse-{int(round(lowest_loss[1] * 10000))}-{computer_name}'
-    old_file = os.path.join(".", f'SuperResulutionNet_best_of_run-{computer_name}')
-    new_file = os.path.join(".", network_name)
-    print(f'Saving best epoch ({lowest_loss[0]}) with loss: {lowest_loss[1]} and psnr: {highest_psnr} as:')
-    print(network_name)
-    os.rename(old_file, new_file)
 
 if __name__ == '__main__':
     freeze_support()
