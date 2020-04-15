@@ -10,6 +10,7 @@ import PIL
 
 class SuperResolutionDataset(Dataset):
     def __init__(self, root_dir, upscale_factor, use_gpu=False):
+        print("teststststst")
         self.root_dir = root_dir
         self.upscale_factor = upscale_factor
         self.images = [
@@ -41,7 +42,7 @@ class SuperResolutionDataset(Dataset):
 
         target_transform = transforms.Compose([
             transforms.ToPILImage(),
-            transforms.CenterCrop([cropped_h, cropped_w]),
+            transforms.RandomCrop([cropped_h, cropped_w]),
             transforms.ToTensor(),
         ])
 

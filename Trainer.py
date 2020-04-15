@@ -1,5 +1,4 @@
 import os
-import sys
 import signal
 import numpy as np
 import math

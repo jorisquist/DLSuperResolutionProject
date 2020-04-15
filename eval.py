@@ -19,8 +19,6 @@ def imshow(img):
     plt.imshow(np.transpose(npimg, (1, 2, 0)))
     plt.show()
 
-
-<<<<<<< HEAD
 def evaluate(netork_name):
     net = torch.load(netork_name)
     r = net.r
