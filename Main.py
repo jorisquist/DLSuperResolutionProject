@@ -21,7 +21,6 @@ import signal
 
 from eval import evaluate
 
-
 def main():
 
     best_parameters, best_values, experiment, model = optimize(
@@ -44,12 +43,14 @@ def train_evaluate(parameters):
     training_set = SuperResolutionDataset('train_data/Set91', r, use_gpu=use_gpu)
     # training_set = SuperResolutionDataset('test_data/BSD500', r, use_gpu=use_gpu)
 
-    train_loader = torch.utils.data.DataLoader(training_set,
-                                               batch_size=bs,
-                                               shuffle=True,
-                                               num_workers=0)
 
+    train_loader = torch.utils.data.DataLoader(
+        training_set, batch_size=bs, shuffle=True, num_workers=0
+    )
+
+    # Initialize the network.
     net = SuperResolutionNet(r, activation=nn.ReLU())
+
     return Trainer.train(net, use_gpu, train_loader, r, max_epochs=1000, max_epochs_without_improvement=100, learning_rate=parameters['lr'])
 
 

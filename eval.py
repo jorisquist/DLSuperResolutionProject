@@ -20,10 +20,12 @@ def imshow(img):
     plt.show()
 
 
+<<<<<<< HEAD
 def evaluate(netork_name):
     net = torch.load(netork_name)
     r = net.r
     print(f"r: {r}")
+
 
     use_gpu = torch.cuda.is_available()
 
@@ -34,10 +36,12 @@ def evaluate(netork_name):
         psnr = []
         test_set = SuperResolutionTestSet(path, r, use_gpu=use_gpu)
 
+
         test_loader = torch.utils.data.DataLoader(test_set,
                                                   batch_size=1,
                                                   shuffle=True,
                                                   num_workers=0)
+
 
         for input, target in iter(test_loader):
             if use_gpu:
@@ -79,6 +83,7 @@ def evaluate(netork_name):
             input = nearest_neighbour(input[0])
             output = torch.clamp(output.detach(), 0, 1)
 
+
             if target.size()[1] == 1:
                 target = target.repeat(1, 3, 1, 1)
 
@@ -98,3 +103,4 @@ def evaluate(netork_name):
 
 if __name__ == '__main__':
     evaluate('SuperResulutionNet_r-3_psnr-3071__mse-8-JORIS-DESKTOP')
+

@@ -9,11 +9,14 @@ import PIL
 
 
 class SuperResolutionDataset(Dataset):
-
     def __init__(self, root_dir, upscale_factor, use_gpu=False):
         self.root_dir = root_dir
         self.upscale_factor = upscale_factor
-        self.images = [f for f in listdir(self.root_dir) if f.endswith('.bmp') or f.endswith('.jpg')]
+        self.images = [
+            f
+            for f in listdir(self.root_dir)
+            if f.endswith(".bmp") or f.endswith(".jpg")
+        ]
         self.data = list()
         for image_name in self.images:
             self.data.append(self.get_data_from_image(image_name))
@@ -29,13 +32,12 @@ class SuperResolutionDataset(Dataset):
         return self.data[item]
 
     def get_data_from_image(self, image_name):
-        image = io.imread(self.root_dir + '/' + image_name)
+        image = io.imread(self.root_dir + "/" + image_name)
 
         # h, w = len(image), len(image[0])
         h, w = 256, 256
         cropped_h = h - (h % self.upscale_factor)
         cropped_w = w - (w % self.upscale_factor)
-
 
         target_transform = transforms.Compose([
             transforms.ToPILImage(),
@@ -43,14 +45,20 @@ class SuperResolutionDataset(Dataset):
             transforms.ToTensor(),
         ])
 
-        input_transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.CenterCrop([cropped_h, cropped_w]),
-            transforms.Resize([int(cropped_h / self.upscale_factor),
-                               int(cropped_w / self.upscale_factor)],
-                              PIL.Image.BICUBIC),
-            transforms.ToTensor(),
-        ])
+        input_transform = transforms.Compose(
+            [
+                transforms.ToPILImage(),
+                transforms.CenterCrop([cropped_h, cropped_w]),
+                transforms.Resize(
+                    [
+                        int(cropped_h / self.upscale_factor),
+                        int(cropped_w / self.upscale_factor),
+                    ],
+                    PIL.Image.BICUBIC,
+                ),
+                transforms.ToTensor(),
+            ]
+        )
 
         target_image = target_transform(image)
         input_image = input_transform(image)
