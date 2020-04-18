@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex"><!-- not public, yet ? -->
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="icon" href="assets/img/favicon.ico">
+<title>Deep learning reproducability - Superresolution </title>
+<!-- Bootstrap core CSS -->
+<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="assets/css/mediumish.css" rel="stylesheet">
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript"
+     src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+</head>
+<body>
+
+<!-- Begin Nav
+================================================== -->
+<nav class="navbar navbar-toggleable-md navbar-light bg-white fixed-top mediumnavigation">
+<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="container">
+	<!-- Begin Logo -->
+	<a class="navbar-brand" href="index.html">
+	<img src="assets/img/logo.png" alt="logo">
+	</a>
+	<!-- End Logo -->
+	<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+		<!-- Begin Menu -->
+
+	</div>
+</div>
+</nav>
+<!-- End Nav
+================================================== -->
+
+<!-- Begin Article
+================================================== -->
+<div class="container">
+	<div class="row">
+
+ 		<!-- Begin Fixed Left Share -->
+		<div class="col-md-2 col-xs-12">
+
+		</div> 
+		<!-- End Fixed Left Share --> 
+
+		<!-- Begin Post -->
+		<div class="col-md-8 col-md-offset-2 col-xs-12">
+			<div class="mainheading">
+
+				<!-- Begin Top Meta -->
+				<div class="row post-top-meta">
+
+					<div class="col-md-12">
+						<span class="author-description">This blog was made by Group 70 for the Deep Learning course of the master Computer Science at Delft University of Technology. Implementation details can be found in the <a href="https://github.com/jorisquist/DLSuperResolutionProject/blob/master/SuperResolution.ipynb">Jupyter notebook</a> in the <a href="https://github.com/jorisquist/DLSuperResolutionProject">repository</a>.</span>
+						<span class="post-date">April 2020</span><span class="dot"></span><span class="post-read">15 min read</span>
+					</div>
+				</div>
+				<!-- End Top Menta -->
+
+				<h1 class="posttitle">Reproducing “Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network” </h1>
+
+			</div>
+
+			<!-- Begin Featured Image -->
+			<img class="featured-image img-fluid" src="assets/img/demopic/10.jpg" alt="">
+			<!-- End Featured Image -->
+
+			<!-- Begin Post Content -->
+			<div class="article-post">
+				<p>
+					
+					As the fields of Deep Learning and Machine Learning has undergone rapid growth in the recent years, so have calls that this led to a reproducibility crisis <a href="https://science.sciencemag.org/content/359/6377/725">[1]</a>. To explore if these claims are true and to learn from potential mistakes of recent authors by struggling to reproduce their paper, we were encouraged to do so in the course Deep Learning at the Delft University of Technology. The goal was to get some hands on experience with current methods of deep learning as well as identifying pitfalls of paper writing for our own possible future work. 
+				</p>
+				<p>
+					We chose the paper “Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network” because of the relevance of the topic as increasing the resolution accurately can be beneficial in many applications. This technique, called super-resolution (SR) can be particularly interesting for satellite communications, surveillance, medical diagnosis, earth and astronomical observations, biometric identifications and the multimedia industry <a href="https://doi.org/10.1016/j.sigpro.2016.05.002">[2]</a><a href="https://pdfs.semanticscholar.org/d576/d9b9f941537953fd833629f8476235c7db28.pdf">[3]</a>.
+				</p>
+				<p>
+					 The main goal is to restore a high-resolution (HR) image from the corresponding low-resolution (LR) image. This can be done with classical interpolation techniques, but maybe better performance can be achieved by using neural networks. The idea is to train a neural network to learn to upsample images. The usual difficult problem of acquiring training data or labels is easily solved by starting from a high-resolution image, classically downsampling this, and using the downsampled image as the input for a neural net, with the high-resolution image as the training set.
+				<blockquote>
+					Gen-z strategy long tail churn rate seed money channels user experience incubator startup partner network low hanging fruit direct mailing. Client backing success startup assets responsive web design burn rate A/B testing metrics first mover advantage conversion.
+				</blockquote>
+				<p>
+					What makes this paper so special is that the way they do super-resolution is computational very effective, hence enables real-time super-resolution on 1080p videos on a single GPU. Lets get into it and explain how they do this. 
+				</p>
+
+
+<p>
+	<b>Efficient Sub-Pixel Convolutional Neural Network (ESPCN)</b><br />
+Usually super-resolution is performed by first upscaling the low-resolution image, commonly with a  bicubic interpolation, to the high-resolution space before reconstruction. The problem is that the super-resolution is performed in the high-resolution space and this is sub-optimal and adds complexity.  An example for this is the SRCNN, a model the authors seek out to improve on. The authors propose a new architecture, the “Efficient Sub-Pixel Convolutional Neural Network”. The proposed architecture has two key features: First, the L-layer convolutional neural network is directly applied to the LR space. And sub-pixel convolutional layer is only applied at the end of the network, using Periodic Shuffling (PS), to map the LR feature maps onto a SR image.  Due to the reduced input resolution smaller filter sizes can be used, lowering the computational and memory requirements. 
+Secondly the upscaling filters in a L-layer network are the L-1 layers before the last one, as opposed to using on explicit upscaling filter at the end. This effectively lets the network learn a better and more complex mapping from LR to HR, increasing the accuracy of the reconstruction. Figure 1 illustrates the architecture of the network.
+</p>
+
+<!-- implentation details -->
+
+				<p>
+					<pre><span></span><span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="k">class</span> <span class="nc">SuperResolutionNet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+
+        <span class="c1"># self.conv1 = nn.Conv2d(3, 64, 5, padding=2)</span>
+        <span class="c1"># self.conv2 = nn.Conv2d(64, 64, 3, padding=1)</span>
+        <span class="c1"># self.conv3 = nn.Conv2d(64, 32, 3, padding=1)</span>
+        <span class="c1"># self.conv4 = nn.Conv2d(32, self.r * self.r * 3, 3, padding=1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deconvolution</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">PixelShuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="c1"># nn.Conv2d(64, 64, 3, padding=1),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># self.params = list(self.layers.parameters())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">)</span>  <span class="c1"># The number of hidden layers</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">x</span><span class="p">))</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">-</span> <span class="mi">1</span><span class="p">](</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># Don't use the activation on the last convolutional layer</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deconvolution</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</pre>
+				</p>
+			</div>
+			<!-- End Post Content -->
+
+			<a href="https://github.com/jorisquist/DLSuperResolutionProject">Code on github</a>
+
+		</div>
+		<!-- End Post -->
+
+	</div>
+</div>
+<!-- End Article
+================================================== -->
+
+<div class="hideshare"></div>
+
+
+<!-- Begin AlertBar
+================================================== -->
+
+<!-- End AlertBar
+================================================== -->
+
+<!-- Begin Footer
+================================================== -->
+<div class="container">
+	<div class="footer">
+		<p class="pull-left">
+			 Copyright &copy; 2020 Group 70
+		</p>
+		<p class="pull-right">
+		</p>
+		<div class="clearfix">
+		</div>
+	</div>
+</div>
+<!-- End Footer
+================================================== -->
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+<script src="assets/js/mediumish.js"></script>
+</body>
+</html>
