@@ -99,7 +99,7 @@
 			<div class="article-post">
 				<p>
 					
-					As the fields of Deep Learning and Machine Learning has undergone rapid growth in the recent years, so have calls that this led to a reproducibility crisis <a href="https://science.sciencemag.org/content/359/6377/725">[1]</a>. To explore if these claims about a reproducability crisis are true and to learn from potential mistakes of recent authors, we were encouraged to do so in the course Deep Learning at the Delft University of Technology. The goal was to get some hands on experience with current methods of deep learning as well as identifying pitfalls of paper writing for our own possible future work. 
+					As the fields of Deep Learning and Machine Learning has undergone rapid growth in the recent years, so have calls that this growth led to a reproducibility crisis <a href="https://science.sciencemag.org/content/359/6377/725">[1]</a>. To explore if these claims about a reproducability crisis are true and to learn from potential mistakes of recent authors, we were encouraged to do so in the course Deep Learning at the Delft University of Technology. The goal was to get some hands on experience with current methods of deep learning as well as identifying pitfalls of paper writing for our own possible future work. 
 				</p>
 				<p>
 					We chose the paper “Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network” because of the relevance of the topic as increasing the resolution accurately can be beneficial in many applications. This technique, called super-resolution (SR) can be particularly interesting for satellite communications, surveillance, medical diagnosis, earth and astronomical observations, biometric identifications and the multimedia industry <a href="https://doi.org/10.1016/j.sigpro.2016.05.002">[2]</a><a href="https://pdfs.semanticscholar.org/d576/d9b9f941537953fd833629f8476235c7db28.pdf">[3]</a>.
@@ -125,7 +125,7 @@ Since the periodic shuffle at the end is just a simple mapping, the reverse func
 	The goal of this project specifically is to reproduce the results from Table 1 of the paper using only information given in the paper.
 	The PSNR is calculated in the following way: $PSNR = 10 \cdot log(1/MSE)$ where MSE is the mean square error between the output of the network
 	and the target image. Note that PSNR has been shown to perform poorly compared to other quality metrics when it comes to estimating the quality of images as perceived by humans <a href="https://ieeexplore.ieee.org/document/4550695">[4]</a>.
-	We will implementing the network using <a href="https://pytorch.org/">Pytorch</a>.
+	We will be implementing the network using <a href="https://pytorch.org/">Pytorch</a>.
 	
 	<img src="assets/img/results_paper.png" class="col-md-12" />
 	
@@ -210,7 +210,7 @@ To start training the network, we first have to generate the data. A couple of s
 First an input image is downscaled by a factor $r=3$. The authors of the paper also add some gaussian noise on the image before it is downscaled,
 but they didn't mention exactly how they did this, so in the end we didn't do this.
 Then sub-images are generated using a sliding window with size 17 and stride 14 on the downscaled images
-and size 17r and 14r on the target images. This helps because then all during training all the images are the same size, so that training can be done in batches.
+and size 17r and 14r on the target images. This helps because then during training all the images are the same size, so that training can be done in batches.
 The reverse deconvolution is also applied to the target images so that the convolution skipped during training. This helps with performance,
 because this step needs to only be done once before training instead of every forward pass during training.
 <br />
@@ -267,7 +267,7 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
 
 
 	Here 'train_evaluate' is a function that trains the network using the given parameters and returns the mean square error.
-	The parameters we tried to optimize where the learning rate, the learning rate update factor, which is the factor with which the learning rate
+	The parameters we tried to optimize were the learning rate, the learning rate update factor, which is the factor with which the learning rate
 	is multiplied when there is no performance improvement, and beta1 and 2 which are values used by the Adam optimizer.
 	Running this gave us the following best values. Learning rate: 7.756e-6, beta1: 0.546, beta2: 0.281, learning_rate_factor: 0.799
 	Using these values we trained one more network, which was the best performing network we found. The results for the hyperparameter optimisation can be found in the figures below.<br/>
