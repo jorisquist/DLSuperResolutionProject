@@ -26,6 +26,8 @@ class SuperResolutionNet(nn.Module):
             x = self.activation(layer(x))
 
         x = self.last_layer(x)  # Don't use the activation on the last convolutional layer
-        x = self.deconvolution(x)
+
+        if not self.training:
+          x = self.deconvolution(x)
 
         return x
