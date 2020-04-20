@@ -107,6 +107,7 @@
 Usually super-resolution is performed by first upscaling the low-resolution image, commonly with a  bicubic interpolation, to the high-resolution space before reconstruction. The problem is that the super-resolution is performed in the high-resolution space and this is sub-optimal and adds complexity.  An example for this is the SRCNN, a model the authors seek out to improve on. The authors propose a new architecture, the “Efficient Sub-Pixel Convolutional Neural Network”. The proposed architecture has two key features: First, the L-layer convolutional neural network is directly applied to the LR space. And sub-pixel convolutional layer is only applied at the end of the network, using Periodic Shuffling (PS), to map the LR feature maps onto a SR image.  Due to the reduced input resolution smaller filter sizes can be used, lowering the computational and memory requirements. 
 Secondly the upscaling filters in a L-layer network are the L-1 layers before the last one, as opposed to using on explicit upscaling filter at the end. This effectively lets the network learn a better and more complex mapping from LR to HR, increasing the accuracy of the reconstruction.
 Since the periodic shuffle at the end is just a simple mapping, the reverse function can be applied to the training targets and it can be omitted for the last step of the network. This way no computation is being done on the in HR space. Figure 1 illustrates the architecture of the network.
+<img src="assets/img/results_paper.png" /> 
 </p>
 
 <p>
