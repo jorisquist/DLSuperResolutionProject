@@ -249,6 +249,10 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
 
 
 	Here 'train_evaluate' is a function that trains the network using the given parameters and returns the mean square error.
+	The parameters we tried to optimize where the learning rate, the learning rate update factor, which is the factor with which the learning rate
+	is multiplied when there is no performance improvement, and beta1 and 2 which are values used by the Adam optimizer.
+	Running this gave us the following best values. Learning rate: 7.756e-6, beta1: 0.546, beta2: 0.281, learning_rate_factor: 0.799
+	Using these values we trained one more network, which was the best performing network we found.
 	
 
 </p>
