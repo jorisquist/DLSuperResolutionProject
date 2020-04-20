@@ -217,7 +217,7 @@ because this step needs to only be done once before training instead of every fo
 
 The loss function used during training was the mean squared error:<br/>
 <br/>
-$\ell(W_{1:L}, b_{1:L}) = \frac{1}{HW}\sum^{H}_{x=1}\sum^{W}_{x=1} (\boldsymbol{I}^{HR}_{x,y} - f^L_{x,y}(\boldsymbol{I}^{LR}))^2$<br />
+$\ell(W_{1:L}, b_{1:L}) = \frac{1}{r^{2}HW}\sum^{rH}_{x=1}\sum^{rW}_{x=1} (\boldsymbol{I}^{HR}_{x,y} - f^L_{x,y}(\boldsymbol{I}^{LR}))^2$<br />
 <br/>
 This function was used since minimizing the loss is the same as maximizing the PSNR which is a good metric to meassure the performance of the upscaling.
 <br/>
