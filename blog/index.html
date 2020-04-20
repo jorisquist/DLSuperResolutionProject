@@ -69,7 +69,7 @@
 				<div class="row post-top-meta">
 
 					<div class="col-md-12">
-						<span class="author-description">This blog was made by Group 70 for the Deep Learning course of the master Computer Science at Delft University of Technology. Implementation details can be found in the <a href="https://github.com/jorisquist/DLSuperResolutionProject/blob/master/SuperResolution.ipynb">Jupyter notebook</a> in the <a href="https://github.com/jorisquist/DLSuperResolutionProject">repository</a>.</span>
+						<span class="author-description">This blog was made by Group 70 for the Deep Learning course of the master Computer Science at Delft University of Technology. Implementation details can be found in the <a href="https://github.com/jorisquist/DLSuperResolutionProject/blob/master/SuperResolution.ipynb">Jupyter notebook</a> in the <a href="https://github.com/jorisquist/DLSuperResolutionProject">repository</a>. Similar projects can be found on <a href="https://reproducedpapers.org">reproducedpapers.org</a>.</span>
 						<span class="post-date">April 2020</span><span class="dot"></span><span class="post-read">15 min read</span>
 					</div>
 				</div>
@@ -80,14 +80,14 @@
 			</div>
 
 			<!-- Begin Featured Image -->
-			<img class="featured-image img-fluid" src="assets/img/demopic/10.jpg" alt="">
+			<img class="featured-image img-fluid" src="assets/img/header.png" alt="">
 			<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
 			<div class="article-post">
 				<p>
 					
-					As the fields of Deep Learning and Machine Learning has undergone rapid growth in the recent years, so have calls that this led to a reproducibility crisis <a href="https://science.sciencemag.org/content/359/6377/725">[1]</a>. To explore if these claims are true and to learn from potential mistakes of recent authors by struggling to reproduce their paper, we were encouraged to do so in the course Deep Learning at the Delft University of Technology. The goal was to get some hands on experience with current methods of deep learning as well as identifying pitfalls of paper writing for our own possible future work. 
+					As the fields of Deep Learning and Machine Learning has undergone rapid growth in the recent years, so have calls that this led to a reproducibility crisis <a href="https://science.sciencemag.org/content/359/6377/725">[1]</a>. To explore if these claims about a reproducability crisis are true and to learn from potential mistakes of recent authors, we were encouraged to do so in the course Deep Learning at the Delft University of Technology. The goal was to get some hands on experience with current methods of deep learning as well as identifying pitfalls of paper writing for our own possible future work. 
 				</p>
 				<p>
 					We chose the paper “Real-Time Single Image and Video Super-Resolution Using an Efficient Sub-Pixel Convolutional Neural Network” because of the relevance of the topic as increasing the resolution accurately can be beneficial in many applications. This technique, called super-resolution (SR) can be particularly interesting for satellite communications, surveillance, medical diagnosis, earth and astronomical observations, biometric identifications and the multimedia industry <a href="https://doi.org/10.1016/j.sigpro.2016.05.002">[2]</a><a href="https://pdfs.semanticscholar.org/d576/d9b9f941537953fd833629f8476235c7db28.pdf">[3]</a>.
@@ -95,6 +95,7 @@
 				<p>
 					 The main goal is to restore a high-resolution (HR) image from the corresponding low-resolution (LR) image. This can be done with classical interpolation techniques, but maybe better performance can be achieved by using neural networks. The idea is to train a neural network to learn to upsample images. The usual difficult problem of acquiring training data or labels is easily solved by starting from a high-resolution image, classically downsampling this, and using the downsampled image as the input for a neural net, with the high-resolution image as the training set.
 				<blockquote>
+					EDIT
 					Gen-z strategy long tail churn rate seed money channels user experience incubator startup partner network low hanging fruit direct mailing. Client backing success startup assets responsive web design burn rate A/B testing metrics first mover advantage conversion.
 				</blockquote>
 				<p>
@@ -107,13 +108,14 @@
 Usually super-resolution is performed by first upscaling the low-resolution image, commonly with a  bicubic interpolation, to the high-resolution space before reconstruction. The problem is that the super-resolution is performed in the high-resolution space and this is sub-optimal and adds complexity.  An example for this is the SRCNN, a model the authors seek out to improve on. The authors propose a new architecture, the “Efficient Sub-Pixel Convolutional Neural Network”. The proposed architecture has two key features: First, the L-layer convolutional neural network is directly applied to the LR space. And sub-pixel convolutional layer is only applied at the end of the network, using Periodic Shuffling (PS), to map the LR feature maps onto a SR image.  Due to the reduced input resolution smaller filter sizes can be used, lowering the computational and memory requirements. 
 Secondly the upscaling filters in a L-layer network are the L-1 layers before the last one, as opposed to using on explicit upscaling filter at the end. This effectively lets the network learn a better and more complex mapping from LR to HR, increasing the accuracy of the reconstruction.
 Since the periodic shuffle at the end is just a simple mapping, the reverse function can be applied to the training targets and it can be omitted for the last step of the network. This way no computation is being done on the in HR space. Figure 1 illustrates the architecture of the network.
+<img class="col-md-12" src="assets/img/architecture_paper.png" /> 
 </p>
 
 <p>
 	<b>Goal</b><br/>
 	The goal of this project specifically is to reproduce the results from Table 1 of the paper using only information given in the paper.
 	The PSNR is calculated in the following way: $PSNR = 10 \cdot log(1/MSE)$ where MSE is the mean square error between the output of the network
-	and the target image.
+	and the target image. Note that PSNR has been shown to perform poorly compared to other quality metrics when it comes to estimating the quality of images as perceived by humans <a href="https://ieeexplore.ieee.org/document/4550695">[4]</a>.
 	We will implementing the network using <a href="https://pytorch.org/">Pytorch</a>.
 	
 	<img src="assets/img/results_paper.png" />
@@ -194,14 +196,20 @@ Since the periodic shuffle at the end is just a simple mapping, the reverse func
 
 <p>
 	<b>Training</b><br/>
-	
+
+Idea behind downscaling
+
+Trained on loss function:<br />
+$\ell(W_{1:L}, b_{1:L}) = \frac{1}{HW}\sum^{H}_{x=1}\sum^{W}_{x=1} (\boldsymbol{I}^{HR}_{x,y} - f^L_{x,y}(\boldsymbol{I}^{LR}))^2$<br />
+
+	Traing/test/error graph  ?
 </p>
 
 <p>
 	<b>Hyper Parameter Tuning</b><br/>
 	Since the paper left out quite some details about the training and hyperparameters used, we decided that we woud try to find them ourselves.
 	Since we don't know which optimizer they used, we decided to use Adam. We did this because Adam can, using the right hyperparameters,
-	approximate other optimizers<a href="https://openreview.net/forum?id=HygrAR4tPS">[4]</a>.
+	approximate other optimizers<a href="https://openreview.net/forum?id=HygrAR4tPS">[5]</a>.
 	To do this we used <a href="https://ax.dev/">AX</a>. This is a framework that uses Bayesian optimization to, among other things,
 	help you find good hyperparameters for a neural network. It has a very easy to use API, which allows you to run you first optimization within a few minutes.
 	
@@ -252,12 +260,14 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
 .tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
 .tg .tg-0lax{text-align:left;vertical-align:top}
 </style>
-<table class="tg">
+<table class="tg table">
+	<thead class="thead-light">
   <tr>
     <th class="tg-0pky">Dataset</th>
     <th class="tg-0pky">ESPCN (91 relu)</th>
     <th class="tg-0pky">Our implementation of <span style="font-weight:400;font-style:normal">ESPCN (91 relu)</span><br></th>
   </tr>
+</thead>
   <tr>
     <td class="tg-0pky">Set5</td>
     <td class="tg-0pky">32.39</td>
@@ -289,9 +299,18 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
     <td class="tg-0lax">26.65</td>
   </tr>
 </table>
+We have succeeded in training a network that came close to the performance of the original paper, however we did not reach the level of performance that the authors did. 
+</p>
+<p>
+<b>Discussion</b><br />
+There can be several reasons why our results do no reach the same level of performance. First of all, we should note that PSNR a bit unintuitive for humans as it is a logarithmic scale and especially when comparing images from different sources this is an unreliable metric <a href="https://ieeexplore.ieee.org/document/4550695">[4]</a>. However, as we use the same dataset as the original authors we suppose this makes comparing the PSNR valid and we can now focus on some reasons why our results can deviate. 
+</p>
+<p>
 
-As you can see we didn't reach the level of performance that the authors did. This has probably to do with the fact that there are slight deviations
-between their implementation and ours. 
+<b>Gaussian blur</b> The paper mentions using blurring in the downscaling process, however no specifics on the method and intensity of blurring are given. We have therefore not implemented blurring.<br />
+<b>Optimizer</b> As mentioned earlier, no specific details on the optimizer being used in the paper are given. We opted for Adam.<br/>
+<b>Learning rate</b> An initial learning rate and a final learning rate were given, dynamically chaning with an unspecified parameter $\mu$. We choose to do custom hyperparameter tuning based on the Ax framework.<br />
+<b>Validation</b> For the 91 images dataset, no specific details where given on dividing in a test and train set, or even if (cross-)validation was used at all.
 	
 </p>
 
