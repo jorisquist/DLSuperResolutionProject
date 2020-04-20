@@ -24,7 +24,7 @@
   });
 </script>
 <script type="text/javascript"
-     src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
   </script>
 </head>
 <body>
@@ -94,10 +94,7 @@
 				</p>
 				<p>
 					 The main goal is to restore a high-resolution (HR) image from the corresponding low-resolution (LR) image. This can be done with classical interpolation techniques, but maybe better performance can be achieved by using neural networks. The idea is to train a neural network to learn to upsample images. The usual difficult problem of acquiring training data or labels is easily solved by starting from a high-resolution image, classically downsampling this, and using the downsampled image as the input for a neural net, with the high-resolution image as the training set.
-				<blockquote>
-					EDIT
-					Gen-z strategy long tail churn rate seed money channels user experience incubator startup partner network low hanging fruit direct mailing. Client backing success startup assets responsive web design burn rate A/B testing metrics first mover advantage conversion.
-				</blockquote>
+
 				<p>
 					What makes this paper so special is that the way they do super-resolution is computational very effective, hence enables real-time super-resolution on 1080p videos on a single GPU. Lets get into it and explain how they do this. 
 				</p>
@@ -314,6 +311,7 @@ There can be several reasons why our results do no reach the same level of perfo
 <b>Gaussian blur</b> The paper mentions using blurring in the downscaling process, however no specifics on the method and intensity of blurring are given. We have therefore not implemented blurring.<br />
 <b>Optimizer</b> As mentioned earlier, no specific details on the optimizer being used in the paper are given. We opted for Adam.<br/>
 <b>Learning rate</b> An initial learning rate and a final learning rate were given, dynamically chaning with an unspecified parameter $\mu$. We choose to do custom hyperparameter tuning based on the Ax framework.<br />
+<b>Batch-size</b> No details about batch sizes are given in the paper. To improve training time, we have used a batch size of 64.<br />
 <b>Validation</b> For the 91 images dataset, no specific details where given on dividing in a test and train set, or even if (cross-)validation was used at all.
 	
 </p>
