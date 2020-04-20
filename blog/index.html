@@ -20,6 +20,13 @@
 		font-size: 60%;
 	}
 	</style>
+		<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+</style>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     tex2jax: {
@@ -120,7 +127,7 @@ Since the periodic shuffle at the end is just a simple mapping, the reverse func
 	and the target image. Note that PSNR has been shown to perform poorly compared to other quality metrics when it comes to estimating the quality of images as perceived by humans <a href="https://ieeexplore.ieee.org/document/4550695">[4]</a>.
 	We will implementing the network using <a href="https://pytorch.org/">Pytorch</a>.
 	
-	<img src="assets/img/results_paper.png" />
+	<img src="assets/img/results_paper.png" class="col-md-12" />
 	
 	The right-most column is the best results the authors of the paper have achieved, but to do this they trained the network for a week on 50,000 images from ImageNet.
 	Since that is not really practical for us to do, we are focussing on achieving the results from the "ESPCN (91 relu)" column where they used a training set of 91 images.
@@ -263,7 +270,9 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
 	The parameters we tried to optimize where the learning rate, the learning rate update factor, which is the factor with which the learning rate
 	is multiplied when there is no performance improvement, and beta1 and 2 which are values used by the Adam optimizer.
 	Running this gave us the following best values. Learning rate: 7.756e-6, beta1: 0.546, beta2: 0.281, learning_rate_factor: 0.799
-	Using these values we trained one more network, which was the best performing network we found.
+	Using these values we trained one more network, which was the best performing network we found. The results for the hyperparameter optimisation can be found in the figures below.<br/>
+	<img src="assets/img/hyperparameter_beta.png" class="col-md-12" />
+	<img src="assets/img/hyperparameter_learn_rate.png" class="col-md-12" />
 	
 
 </p>
@@ -274,39 +283,34 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
 	  <div class="row">
 	    <div class="col-sm">
 	    <figure>
-	      <img src="assets/img/result_target_original.png" />
+	      <a href="assets/img/result_target_original.png"><img src="assets/img/result_target_original.png" /></a>
 	      <figcaption>Original</figcaption>
 	  	</figure>
 	    </div>
 	    <div class="col-sm">
 	    	<figure>
-	      <img src="assets/img/result_bicubic.png" />
+	      <a href="assets/img/result_bicubic.png"><img src="assets/img/result_bicubic.png" /></a>
 	      <figcaption>Downsampled, then bicubic upsampled</figcaption>
 	  </figure>
 	    </div>
 
-	    	    <div class="col-sm">
+	    	 <div class="col-sm">
 	    	<figure>
-	      <img src="assets/img/result_bicubic.png" />
-	      <figcaption>Downsampled, then bicubic upsampled</figcaption>
+	      <a href="assets/img/result_downsampled.png"><img src="assets/img/result_downsampled.png" /></a>
+	      <figcaption>Downsampled</figcaption>
 	  </figure>
 	    </div>
 	    <div class="col-sm">
 	    	<figure>
-	      <img src="assets/img/result_nn_output.png" />
+	      <a href="assets/img/result_nn_output.png"><img src="assets/img/result_nn_output.png" /></a>
 	      <figcaption>
 	      Downsampled, then upsampled with our network
 	  </figcaption>
 	  </figure>
 	    </div>
 	</div>
-	<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
-.tg .tg-0lax{text-align:left;vertical-align:top}
-</style>
+<br />
+The PSNR for the different dataset can be found in the table below.
 <table class="tg table">
 	<thead class="thead-light">
   <tr>
