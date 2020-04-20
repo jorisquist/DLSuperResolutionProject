@@ -200,12 +200,23 @@ Since the periodic shuffle at the end is just a simple mapping, the reverse func
 	<b>Training</b><br/>
 
 To start training the network, we first have to generate the data. A couple of steps have to be taken. <br />
-An input image is downscaled by a factor $3$. <br />
+First an input image is downscaled by a factor $r=3$. The authors of the paper also add some gaussian noise on the image before it is downscaled,
+but they didn't mention exactly how they did this, so in the end we didn't do this.
+Then sub-images are generated using a sliding window with size 17 and stride 14 on the downscaled images
+and size 17r and 14r on the target images. This helps because then all during training all the images are the same size, so that training can be done in batches.
+The reverse deconvolution is also applied to the target images so that the convolution skipped during training. This helps with performance,
+because this step needs to only be done once before training instead of every forward pass during training.
+<br />
 
-Trained on loss function:<br />
+The loss function used during training was the mean squared error:<br/>
+<br/>
 $\ell(W_{1:L}, b_{1:L}) = \frac{1}{HW}\sum^{H}_{x=1}\sum^{W}_{x=1} (\boldsymbol{I}^{HR}_{x,y} - f^L_{x,y}(\boldsymbol{I}^{LR}))^2$<br />
+<br/>
+This function was used since minimizing the loss is the same as maximizing the PSNR which is a good metric to meassure the performance of the upscaling.
+<br/>
+During training the average loss is meassured every epoch and when the loss has not improved the learning rate is lowered.
+Once the loss doesn't improve for 100 epochs the training is stopped and the network is evaluated using five different data sets.
 
-	Traing/test/error graph  ?
 </p>
 
 <p>
