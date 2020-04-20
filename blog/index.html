@@ -15,6 +15,11 @@
 <link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
 <!-- Custom styles for this template -->
 <link href="assets/css/mediumish.css" rel="stylesheet">
+<style>
+	figcaption {
+		font-size: 60%;
+	}
+	</style>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     tex2jax: {
@@ -194,7 +199,8 @@ Since the periodic shuffle at the end is just a simple mapping, the reverse func
 <p>
 	<b>Training</b><br/>
 
-Idea behind downscaling
+To start training the network, we first have to generate the data. A couple of steps have to be taken. <br />
+An input image is downscaled by a factor $3$. <br />
 
 Trained on loss function:<br />
 $\ell(W_{1:L}, b_{1:L}) = \frac{1}{HW}\sum^{H}_{x=1}\sum^{W}_{x=1} (\boldsymbol{I}^{HR}_{x,y} - f^L_{x,y}(\boldsymbol{I}^{LR}))^2$<br />
@@ -249,7 +255,36 @@ best_parameters, best_values, experiment, model <span style="color: #666666">=</
 
 <p>
 	<b>Results</b><br/>
-	
+	Some samples of our results can be viewed below (click for large):
+	  <div class="row">
+	    <div class="col-sm">
+	    <figure>
+	      <img src="assets/img/result_target_original.png" />
+	      <figcaption>Original</figcaption>
+	  	</figure>
+	    </div>
+	    <div class="col-sm">
+	    	<figure>
+	      <img src="assets/img/result_bicubic.png" />
+	      <figcaption>Downsampled, then bicubic upsampled</figcaption>
+	  </figure>
+	    </div>
+
+	    	    <div class="col-sm">
+	    	<figure>
+	      <img src="assets/img/result_bicubic.png" />
+	      <figcaption>Downsampled, then bicubic upsampled</figcaption>
+	  </figure>
+	    </div>
+	    <div class="col-sm">
+	    	<figure>
+	      <img src="assets/img/result_nn_output.png" />
+	      <figcaption>
+	      Downsampled, then upsampled with our network
+	  </figcaption>
+	  </figure>
+	    </div>
+	</div>
 	<style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
 .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
@@ -304,11 +339,11 @@ There can be several reasons why our results do no reach the same level of perfo
 </p>
 <p>
 
-<b>Gaussian blur</b> The paper mentions using blurring in the downscaling process, however no specifics on the method and intensity of blurring are given. We have therefore not implemented blurring.<br />
-<b>Optimizer</b> As mentioned earlier, no specific details on the optimizer being used in the paper are given. We opted for Adam.<br/>
-<b>Learning rate</b> An initial learning rate and a final learning rate were given, dynamically chaning with an unspecified parameter $\mu$. We choose to do custom hyperparameter tuning based on the Ax framework.<br />
-<b>Batch-size</b> No details about batch sizes are given in the paper. To improve training time, we have used a batch size of 64.<br />
-<b>Validation</b> For the 91 images dataset, no specific details where given on dividing in a test and train set, or even if (cross-)validation was used at all.
+<b>Gaussian blur</b> <br />The paper mentions using blurring in the downscaling process, however no specifics on the method and intensity of blurring are given. We have therefore not implemented blurring.<br />
+<b>Optimizer</b> <br />As mentioned earlier, no specific details on the optimizer being used in the paper are given. We opted for Adam.<br/>
+<b>Learning rate</b> <br />An initial learning rate and a final learning rate were given, dynamically chaning with an unspecified parameter $\mu$. We choose to do custom hyperparameter tuning based on the Ax framework.<br />
+<b>Batch-size</b> <br />No details about batch sizes are given in the paper. To improve training time, we have used a batch size of 64.<br />
+<b>Validation</b> <br />For the 91 images dataset, no specific details where given on dividing in a test and train set, or even if (cross-)validation was used at all.
 	
 </p>
 
