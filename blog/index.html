@@ -303,10 +303,14 @@ We have succeeded in training a network that came close to the performance of th
 </p>
 <p>
 <b>Discussion</b><br />
-There can be several reasons why our results do no reach the same level of performance. First of all, we should note that PSNR a bit unintuitive for humans as it is a logarithmic scale and especially when comparing images from different sources this is an unreliable metric <a href="https://ieeexplore.ieee.org/document/4550695">[4]</a>. However, as we use the same dataset as the original authors we suppose this makes comparing the PSNR valid and we can now focus some reason why our results can deviate: <br />
+There can be several reasons why our results do no reach the same level of performance. First of all, we should note that PSNR a bit unintuitive for humans as it is a logarithmic scale and especially when comparing images from different sources this is an unreliable metric <a href="https://ieeexplore.ieee.org/document/4550695">[4]</a>. However, as we use the same dataset as the original authors we suppose this makes comparing the PSNR valid and we can now focus on some reasons why our results can deviate. 
+</p>
+<p>
 
-This has probably to do with the fact that there are slight deviations
-between their implementation and ours. 
+<b>Gaussian blur</b> The paper mentions using blurring in the downscaling process, however no specifics on the method and intensity of blurring are given. We have therefore not implemented blurring.<br />
+<b>Optimizer</b> As mentioned earlier, no specific details on the optimizer being used in the paper are given. We opted for Adam.<br/>
+<b>Learning rate</b> An initial learning rate and a final learning rate were given, dynamically chaning with an unspecified parameter $\mu$. We choose to do custom hyperparameter tuning based on the Ax framework.<br />
+<b>Validation</b> For the 91 images dataset, no specific details where given on dividing in a test and train set, or even if (cross-)validation was used at all.
 	
 </p>
 
